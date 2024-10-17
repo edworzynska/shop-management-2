@@ -38,4 +38,10 @@ public class Item {
 
     public Item() {}
 
+    @Override
+    public String toString(){
+        return getName() + ", quantity: " + getQuantity() +
+                ", unit price: " + getUnitPrice() + "GBP";
+    }
+
 }
