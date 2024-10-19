@@ -6,7 +6,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 @Getter
 @EqualsAndHashCode
@@ -19,6 +21,7 @@ public class Order {
     @GeneratedValue
     private Long id;
 
+    @Setter
     @Getter
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
@@ -26,7 +29,7 @@ public class Order {
             joinColumns = {@JoinColumn(name="order_id")},
             inverseJoinColumns = {@JoinColumn(name="item_id")}
     )
-    private Set<Item> items = new HashSet<>();
+    private List<Item> items = new ArrayList<>();
 
     @Getter
     @Setter
@@ -44,6 +47,7 @@ public class Order {
         this.customerName = customerName;
         this.dateOfOrder = dateOfOrder;
     }
+
     @Override
     public String toString(){
         return "Order placed by: " + getCustomerName() + " on " + getDateOfOrder();

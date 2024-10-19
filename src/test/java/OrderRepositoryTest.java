@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -66,20 +67,14 @@ class OrderRepositoryTest {
 
     @Test
     void createsEmptyOrder(){
-        order2 = orderRepository.createOrder("Gucci");
+        order2 = orderRepository.createOrder("Gucci", List.of());
         String result = order2.toString();
         assertEquals(2, orderRepository.all().size());
         assertEquals("Order placed by: Gucci on 2024-10-17", result);
     }
     @Test
     void createsOrderAndAddsItems(){
-        order3 = orderRepository.createOrder("Gucci");
-        session.getTransaction().begin();
-        order3.getItems().add(item1);
-        order3.getItems().add(item2);
-        order3.getItems().add(item3);
-        session.merge(order3);
-        session.getTransaction().commit();
+        order3 = orderRepository.createOrder("Gucci", List.of(item1, item2, item3));
         var result = order3.getItems().size();
         assertEquals(3, result);
 
@@ -88,5 +83,11 @@ class OrderRepositoryTest {
     void returnsAllOrders() {
         var result = orderRepository.all().size();
         assertEquals(1, result);
+    }
+
+    @Test
+    void displaysAllOrdersAsString() {
+        var result = orderRepository.displayAll();
+        assertEquals("Order placed by: First Customer on 2024-10-05\n", result);
     }
 }

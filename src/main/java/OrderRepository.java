@@ -2,11 +2,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import java.time.LocalDate;
+
 import java.util.List;
 
 public class OrderRepository {
     private SessionFactory sessionFactory;
     private Order order;
+    private Session session;
 
     public OrderRepository(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
@@ -22,18 +24,36 @@ public class OrderRepository {
         }
         return allOrders;
     }
+//    private void addToCart(List<Item> items){
+//        session.getTransaction().begin();
+//        for (Item item : items){
+//            order.getItems().add(item);
+//        }
+//        session.merge(order);
+//        session.getTransaction().commit();
+//    }
 
-    public Order createOrder(String name){
+    public Order createOrder(String name, List<Item> items){
 
-        Session session = sessionFactory.openSession();
+        session = sessionFactory.openSession();
         session.getTransaction().begin();
         order = new Order();
         order.setCustomerName(name);
         order.setDateOfOrder(LocalDate.now());
-        session.persist(order);
+
+        order.setItems(items);
+
+        session.merge(order);
         session.getTransaction().commit();
         session.close();
 
         return order;
+    }
+    public String displayAll(){
+        StringBuilder str = new StringBuilder();
+        for (Order order : all()){
+            str.append(order.toString()).append("\n");
+        }
+        return str.isEmpty()? "No active orders!" : str.toString();
     }
 }

@@ -55,6 +55,13 @@ class ItemRepositoryTest {
         item4.setQuantity(100L);
         session.persist(item4);
 
+        order1 = new Order();
+        order1.setCustomerName("First Customer");
+        order1.setDateOfOrder(LocalDate.parse("2024-10-05"));
+        order1.getItems().add(item4);
+        order1.getItems().add(item2);
+        session.persist(order1);
+
         session.getTransaction().commit();
     }
 
@@ -71,5 +78,25 @@ class ItemRepositoryTest {
         assertEquals(5, size);
         var str = item5.toString();
         assertEquals("tomatoes, quantity: 500, unit price: 1.2GBP", str);
+    }
+
+    @Test
+    void displaysAll() {
+        var result = itemRepository.displayAll();
+        assertEquals("milk, quantity: 50, unit price: 2.0GBP\n" +
+                "butter, quantity: 20, unit price: 5.0GBP\n" +
+                "egg, quantity: 200, unit price: 0.2GBP\n" +
+                "bread, quantity: 100, unit price: 3.5GBP\n", result);
+    }
+    @Test
+    void returnsListOfItemsInOrder(){
+        var result = itemRepository.itemsInOrder(order1);
+        var resultSize = result.size();
+        assertEquals(2, resultSize);
+        var resultStr = "";
+        for (Item item : result){
+            resultStr += item.toString();
+        }
+        assertEquals("butter, quantity: 20, unit price: 5.0GBPbread, quantity: 100, unit price: 3.5GBP", resultStr);
     }
 }
