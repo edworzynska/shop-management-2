@@ -5,17 +5,21 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        HibernateUtil hibernateUtil = new HibernateUtil();
-        SessionFactory sessionFactory = hibernateUtil.startSession();
-        ItemRepository itemRepository = new ItemRepository(sessionFactory);
-        OrderRepository orderRepository = new OrderRepository(sessionFactory);
-        Scanner scanner = new Scanner(System.in);
-        int selected;
+    private final ItemRepository itemRepository;
+    private final OrderRepository orderRepository;
+    private final Scanner scanner;
 
+    public Main(ItemRepository itemRepository, OrderRepository orderRepository, Scanner scanner) {
+        this.itemRepository = itemRepository;
+        this.orderRepository = orderRepository;
+        this.scanner = scanner;
+    }
+
+    public void run() {
+        int selected;
         System.out.println("===>   Welcome to ShopManager!   <===\n");
 
-        do{
+        do {
             System.out.println("Please select the action:\n" +
                     "1 = show the items in stock\n" +
                     "2 = add an item to the stock\n" +
@@ -39,10 +43,10 @@ public class Main {
                     break;
                 case 3:
                     List<Order> all = orderRepository.all();
-                    for (Order order : all){
+                    for (Order order : all) {
                         System.out.println(order.toString() + "\nordered items: ");
                         List<Item> itemsInOrder = itemRepository.itemsInOrder(order);
-                        for (Item item : itemsInOrder){
+                        for (Item item : itemsInOrder) {
                             System.out.println(item.toString());
                         }
                     }
@@ -71,5 +75,16 @@ public class Main {
                     break;
             }
         } while (selected != 0);
+    }
+
+    public static void main(String[] args) {
+        HibernateUtil hibernateUtil = new HibernateUtil();
+        SessionFactory sessionFactory = hibernateUtil.startSession();
+        ItemRepository itemRepository = new ItemRepository(sessionFactory);
+        OrderRepository orderRepository = new OrderRepository(sessionFactory);
+        Scanner scanner = new Scanner(System.in);
+
+        Main mainApp = new Main(itemRepository, orderRepository, scanner);
+        mainApp.run();
     }
 }

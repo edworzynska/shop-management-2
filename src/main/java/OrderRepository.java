@@ -8,7 +8,6 @@ import java.util.List;
 public class OrderRepository {
     private SessionFactory sessionFactory;
     private Order order;
-    private Session session;
 
     public OrderRepository(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
@@ -19,33 +18,25 @@ public class OrderRepository {
         try (Session session = sessionFactory.openSession()) {
             allOrders = session.createQuery("from Order", Order.class).getResultList();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
         return allOrders;
     }
-//    private void addToCart(List<Item> items){
-//        session.getTransaction().begin();
-//        for (Item item : items){
-//            order.getItems().add(item);
-//        }
-//        session.merge(order);
-//        session.getTransaction().commit();
-//    }
 
-    public Order createOrder(String name, List<Item> items){
+   public Order createOrder(String name, List<Item> items){
 
-        session = sessionFactory.openSession();
-        session.getTransaction().begin();
-        order = new Order();
-        order.setCustomerName(name);
-        order.setDateOfOrder(LocalDate.now());
+        try (Session session = sessionFactory.openSession()){
+           session.getTransaction().begin();
+           order = new Order();
+           order.setCustomerName(name);
+           order.setDateOfOrder(LocalDate.now());
+           order.setItems(items);
+           session.merge(order);
+           session.getTransaction().commit();
 
-        order.setItems(items);
-
-        session.merge(order);
-        session.getTransaction().commit();
-        session.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
 
         return order;
     }

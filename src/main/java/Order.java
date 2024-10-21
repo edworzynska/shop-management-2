@@ -21,7 +21,6 @@ public class Order {
     @GeneratedValue
     private Long id;
 
-    @Setter
     @Getter
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
@@ -32,7 +31,6 @@ public class Order {
     private List<Item> items = new ArrayList<>();
 
     @Getter
-    @Setter
     @Column(name = "customer_name")
     private String customerName;
 
@@ -40,6 +38,16 @@ public class Order {
     @Setter
     @Column(name = "date_of_order")
     private LocalDate dateOfOrder;
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+        if (items.isEmpty()) throw new RuntimeException("Unable to create an empty order!");
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+        if (customerName.isEmpty() || customerName.isBlank()) throw new RuntimeException("Customer's name cannot be empty!");
+    }
 
     public Order() {}
 

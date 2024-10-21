@@ -5,8 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ItemRepositoryTest {
     private static HibernateUtil hibernateUtil;
@@ -72,12 +74,42 @@ class ItemRepositoryTest {
     }
 
     @Test
+    void returnsEmptyListIfNoItemsAreAdded() {
+        session.getTransaction().begin();
+        session.remove(order1);
+        session.remove(item1);
+        session.remove(item2);
+        session.remove(item3);
+        session.remove(item4);
+        session.getTransaction().commit();
+        var result = itemRepository.all();
+        assertEquals(List.of(), result);
+    }
+
+    @Test
     void createsItem() {
         Item item5 = itemRepository.createItem("tomatoes", 1.20, 500L);
         var size = itemRepository.all().size();
         assertEquals(5, size);
         var str = item5.toString();
         assertEquals("tomatoes, quantity: 500, unit price: 1.2GBP", str);
+    }
+
+
+    @Test
+    void throwsAnErrorWhileCreatingItemWithInvalidName() {
+        RuntimeException r = assertThrows(RuntimeException.class, ()->itemRepository.createItem("", 5.0, 10L));
+        assertEquals("Product's name cannot be empty!", r.getMessage());
+    }
+    @Test
+    void throwsAnErrorWhileCreatingItemWithInvalidPrice() {
+        RuntimeException r = assertThrows(RuntimeException.class, ()->itemRepository.createItem("doo", 0.0, 10L));
+        assertEquals("Price cannot be less or equal to 0!", r.getMessage());
+    }
+    @Test
+    void throwsAnErrorWhileCreatingItemWithInvalidQuantity() {
+        RuntimeException r = assertThrows(RuntimeException.class, ()->itemRepository.createItem("doo", 5.0, -5L));
+        assertEquals("Quantity cannot be less or equal to 0!", r.getMessage());
     }
 
     @Test
@@ -88,6 +120,20 @@ class ItemRepositoryTest {
                 "egg, quantity: 200, unit price: 0.2GBP\n" +
                 "bread, quantity: 100, unit price: 3.5GBP\n", result);
     }
+
+    @Test
+    void returnsMessageIfDisplayingEmptyListOfItems() {
+        session.getTransaction().begin();
+        session.remove(order1);
+        session.remove(item1);
+        session.remove(item2);
+        session.remove(item3);
+        session.remove(item4);
+        session.getTransaction().commit();
+        var result = itemRepository.displayAll();
+        assertEquals("Your stock is empty!", result);
+    }
+
     @Test
     void returnsListOfItemsInOrder(){
         var result = itemRepository.itemsInOrder(order1);

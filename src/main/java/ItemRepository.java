@@ -18,8 +18,7 @@ public class ItemRepository {
         try (Session session = sessionFactory.openSession()) {
             allItems = session.createQuery("from Item", Item.class).getResultList();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
         return allItems;
     }
@@ -33,39 +32,44 @@ public class ItemRepository {
 
     public Item createItem(String name, Double unitPrice, Long quantity){
 
-        Session session = sessionFactory.openSession();
-        session.getTransaction().begin();
-        item = new Item();
-        item.setName(name);
-        item.setUnitPrice(unitPrice);
-        item.setQuantity(quantity);
-        session.persist(item);
-        session.getTransaction().commit();
-        session.close();
+        try(Session session = sessionFactory.openSession()) {
+            session.getTransaction().begin();
+            item = new Item();
+            item.setName(name);
+            item.setUnitPrice(unitPrice);
+            item.setQuantity(quantity);
+            session.persist(item);
+            session.getTransaction().commit();
 
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
         return item;
     }
 
     public List<Item> findByNameAndReturnList(List<String> itemsToAdd){
-        Session session = sessionFactory.openSession();
         List<Item> itemList = new ArrayList<>();
-        for (String str : itemsToAdd){
-            Item item = session.createQuery("from Item where name = :name", Item.class)
-                    .setParameter("name", str)
-                    .getSingleResult();
-            itemList.add(item);
+        try(Session session = sessionFactory.openSession()) {
+            for (String str : itemsToAdd) {
+                Item item = session.createQuery("from Item where name = :name", Item.class)
+                        .setParameter("name", str)
+                        .getSingleResult();
+                itemList.add(item);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
         return itemList;
     }
     public List<Item> itemsInOrder(Order order){
-        List<Item> itemsInOrder = null;
+        List<Item> itemsInOrder;
+
         try (Session session = sessionFactory.openSession()) {
             itemsInOrder = session.createQuery("from Item i join i.orders o where o.id = :id", Item.class)
                     .setParameter("id", order.getId())
                     .getResultList();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
         return itemsInOrder;
 

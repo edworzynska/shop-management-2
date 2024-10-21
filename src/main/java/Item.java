@@ -22,17 +22,29 @@ public class Item {
     private Set<Order> orders = new HashSet<>();
 
     @Getter
-    @Setter
     @Column(name="name")
     private String name;
 
+    public void setName(String name) {
+        this.name = name;
+        if (name.isEmpty() || name.isBlank()) throw new RuntimeException("Product's name cannot be empty!");
+    }
+
+    public void setUnitPrice(Double unitPrice) {
+        this.unitPrice = unitPrice;
+        if (unitPrice <= 0.0) throw new RuntimeException("Price cannot be less or equal to 0!");
+    }
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
+        if (quantity <= 0) throw new RuntimeException("Quantity cannot be less or equal to 0!");
+    }
+
     @Getter
-    @Setter
     @Column(name="unit_price")
     private Double unitPrice;
 
     @Getter
-    @Setter
     @Column(name="quantity")
     private Long quantity;
 
