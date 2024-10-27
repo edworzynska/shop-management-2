@@ -23,6 +23,7 @@ public class OrderRepository {
         return allOrders;
     }
 
+//Order object would be better
    public Order createOrder(String name, List<Item> items){
 
         try (Session session = sessionFactory.openSession()){
@@ -40,6 +41,7 @@ public class OrderRepository {
 
         return order;
     }
+        //repository should only be responsible for db operations not display concerns
     public String displayAll(){
         StringBuilder str = new StringBuilder();
         for (Order order : all()){

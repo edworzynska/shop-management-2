@@ -22,6 +22,7 @@ public class ItemRepository {
         }
         return allItems;
     }
+    //repository should only be responsible for db operations not display concerns
     public String displayAll(){
         StringBuilder str = new StringBuilder();
         for (Item item : all()){
@@ -30,6 +31,7 @@ public class ItemRepository {
         return str.isEmpty()? "Your stock is empty!" : str.toString();
     }
 
+//just use Item as an argument
     public Item createItem(String name, Double unitPrice, Long quantity){
 
         try(Session session = sessionFactory.openSession()) {
@@ -46,7 +48,7 @@ public class ItemRepository {
         }
         return item;
     }
-
+//..."and return list" is not the best example of naming e.g. good name: findItems (plurar implies a collection output type)
     public List<Item> findByNameAndReturnList(List<String> itemsToAdd){
         List<Item> itemList = new ArrayList<>();
         try(Session session = sessionFactory.openSession()) {
